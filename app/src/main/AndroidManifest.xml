@@ -15,13 +15,6 @@
             android:name=".CadastroActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity2"
-            android:exported="false"
-            android:label="@string/title_activity_main2" />
-        <activity
-            android:name=".CadastroActivity"
-            android:exported="false" /> <!-- LoginActivity como tela inicial -->
-        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
