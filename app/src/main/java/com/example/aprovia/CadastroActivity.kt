@@ -98,6 +98,8 @@ class CadastroActivity : AppCompatActivity() {
             else{
                 // Cadastro bem-sucedido
                 Toast.makeText(this, "Cadastro bem-sucedido", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
     }

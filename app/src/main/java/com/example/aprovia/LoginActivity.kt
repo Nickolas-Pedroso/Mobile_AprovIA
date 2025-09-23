@@ -41,6 +41,13 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Tela de cadastro
+        val ajuda = findViewById<TextView>(R.id.txtAjuda)
+        ajuda.setOnClickListener {
+            val intent = Intent(this, faq_ajuda::class.java)
+            startActivity(intent)
+        }
+
         // Botão de login
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val edtUser = findViewById<EditText>(R.id.edtUser)
