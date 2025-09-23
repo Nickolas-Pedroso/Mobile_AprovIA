@@ -1,5 +1,6 @@
 package com.example.aprovia
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
             scroll.post { scroll.fullScroll(View.FOCUS_DOWN) }
         }
 
+        @SuppressLint("UseCompatLoadingForDrawables")
         fun addMessage(text: String, isUser: Boolean) {
             val tv = TextView(this).apply {
                 this.text = text

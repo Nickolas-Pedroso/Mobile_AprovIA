@@ -15,6 +15,15 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Verifica se o usuário já está logado ANTES de renderizar a tela. 🚀
+        val prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE)
+        if (prefs.getBoolean("LOGGED_IN", false)) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return // Retorna para evitar a execução do resto do código
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_login)
 
@@ -24,18 +33,12 @@ class LoginActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         // Tela de cadastro
         val cadastro = findViewById<TextView>(R.id.txtCadastro)
         cadastro.setOnClickListener {
             val intent = Intent(this, CadastroActivity::class.java)
             startActivity(intent)
-        }
-
-        // Verifica se o usuário já está logado
-        val prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE)
-        if (prefs.getBoolean("LOGGED_IN", false)) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
         }
 
         // Botão de login
@@ -47,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
             val user = edtUser.text.toString()
             val pass = edtPass.text.toString()
 
-            // Simulação de login (substitua com sua lógica real)
+            // Simulação de login
             if (user == "admin" && pass == "1234") {
                 prefs.edit().putBoolean("LOGGED_IN", true).apply()
                 val intent = Intent(this, MainActivity::class.java)
