@@ -43,6 +43,7 @@
                     android:id="@+id/logoImage"
                     android:layout_width="185dp"
                     android:layout_height="64dp"
+                    android:clickable="true"
                     android:contentDescription="@string/app_name"
                     android:src="@drawable/aprovia_logo"
                     tools:src="@drawable/ic_launcher_foreground" />

@@ -1,10 +1,12 @@
 package com.example.aprovia
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -61,6 +63,21 @@ class MainActivity : AppCompatActivity() {
             messagesContainer.addView(tv)
             scrollToBottom()
         }
+
+        val sair = findViewById<ImageView>(R.id.logoImage)
+        sair.setOnClickListener {
+            // limpa o estado de login
+            val prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE)
+            val editor = prefs.edit()
+            editor.putBoolean("isLoggedIn", false)
+            editor.apply()
+
+            // abre a tela de login e limpa a pilha de atividades
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // fecha a tela atual para não poder voltar com "voltar"
+        }
+
 
         btnSend.setOnClickListener {
             val text = input.text.toString().trim()
