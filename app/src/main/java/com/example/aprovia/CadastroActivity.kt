@@ -86,7 +86,7 @@ class CadastroActivity : AppCompatActivity() {
             val senha = editTextSenha.text.toString()
             val confirmarSenha = editTextConfirmarSenha.text.toString()
 
-            // Validação
+            // Validação de Cadastro
             if (nome.isEmpty() || usuario.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty() || confirmarSenha.isEmpty()) {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener

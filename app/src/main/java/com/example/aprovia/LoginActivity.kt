@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.edit
 
 class LoginActivity : AppCompatActivity() {
 
@@ -34,14 +35,14 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
-        // Tela de cadastro
+        // Tela de Login, ação para ir para a tela de cadastro
         val cadastro = findViewById<TextView>(R.id.txtCadastro)
         cadastro.setOnClickListener {
             val intent = Intent(this, CadastroActivity::class.java)
             startActivity(intent)
         }
 
-        // Tela de cadastro
+        // Tela de Login, ação para ir para a tela de ajuda
         val ajuda = findViewById<TextView>(R.id.txtAjuda)
         ajuda.setOnClickListener {
             val intent = Intent(this, faq_ajuda::class.java)
@@ -59,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
 
             // Simulação de login
             if (user == "admin" && pass == "1234") {
-                prefs.edit().putBoolean("LOGGED_IN", true).apply()
+                prefs.edit { putBoolean("LOGGED_IN", true) }
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish() // fecha a LoginActivity

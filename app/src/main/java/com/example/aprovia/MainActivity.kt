@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // (opcional) aplica Dynamic Colors em aparelhos compatíveis
+        // aplica Dynamic Colors em aparelhos compatíveis
         DynamicColors.applyToActivityIfAvailable(this)
 
         setContentView(R.layout.activity_main)
@@ -53,10 +53,10 @@ class MainActivity : AppCompatActivity() {
             ).apply {
                 topMargin = 12
                 bottomMargin = 12
-                if (isUser) {
-                    gravity = Gravity.END
+                gravity = if (isUser) {
+                    Gravity.END
                 } else {
-                    gravity = Gravity.START
+                    Gravity.START
                 }
             }
 

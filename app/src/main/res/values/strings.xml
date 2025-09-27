@@ -4,4 +4,8 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="open_drawer">Abrir menu</string>
+    <string name="close_drawer">Fechar menu</string>
+    <string name="header_image_desc">Imagem do usuário</string>
+
 </resources>
