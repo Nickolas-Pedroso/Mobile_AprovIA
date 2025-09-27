@@ -12,6 +12,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.color.DynamicColors
+import androidx.core.content.edit
 
 class MainActivity : AppCompatActivity() {
 
@@ -68,12 +69,13 @@ class MainActivity : AppCompatActivity() {
         sair.setOnClickListener {
             // limpa o estado de login
             val prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE)
-            val editor = prefs.edit()
-            editor.putBoolean("isLoggedIn", false)
-            editor.apply()
+            prefs.edit{
+                putBoolean("LOGGED_IN", false)
+            }
 
             // abre a tela de login e limpa a pilha de atividades
             val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // <--- ADICIONADO
             startActivity(intent)
             finish() // fecha a tela atual para não poder voltar com "voltar"
         }
