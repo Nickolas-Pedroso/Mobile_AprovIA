@@ -1,111 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F0F0F"
     tools:context=".MainActivity">
 
-    <!-- Cartão central com cantos arredondados -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardRoot"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="16dp"
-        app:cardBackgroundColor="@android:color/transparent"
-        app:cardCornerRadius="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <!-- CONTEÚDO PRINCIPAL -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#0F0F0F">
 
-        <!-- Fundo do cartão -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_panel">
+        <!-- Cartão central -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardRoot"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Logo + nome do app -->
-            <LinearLayout
-                android:id="@+id/header"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <!-- Fundo do cartão -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_panel">
 
-                <ImageView
-                    android:id="@+id/logoImage"
-                    android:layout_width="185dp"
-                    android:layout_height="64dp"
-                    android:clickable="true"
-                    android:contentDescription="@string/app_name"
-                    android:src="@drawable/aprovia_logo"
-                    tools:src="@drawable/ic_launcher_foreground" />
-
-            </LinearLayout>
-
-            <!-- Área de mensagens (vazia por enquanto) -->
-            <ScrollView
-                android:id="@+id/scrollMessages"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:fillViewport="true"
-                android:padding="12dp"
-                app:layout_constraintBottom_toTopOf="@id/inputRow"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/header">
-                <LinearLayout
-                    android:id="@+id/messagesContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                </LinearLayout>
-            </ScrollView>
-
-            <!-- Barra de digitar + botão enviar -->
-            <LinearLayout
-                android:id="@+id/inputRow"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:background="@drawable/bg_input"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <EditText
-                    android:id="@+id/etMessage"
+                <!-- HEADER COM MENU + LOGO CENTRALIZADO -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/header"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Digite sua mensagem..."
-                    android:background="@android:color/transparent"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="8dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <!-- Ícone do menu lateral -->
+                    <ImageView
+                        android:id="@+id/menuIcon"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:contentDescription="Menu lateral"
+                        android:focusable="true"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_sidebar"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@android:color/white" />
+
+                    <!-- Logo centralizado -->
+                    <ImageView
+                        android:id="@+id/logoImage"
+                        android:layout_width="185dp"
+                        android:layout_height="64dp"
+                        android:clickable="true"
+                        android:contentDescription="@string/app_name"
+                        android:focusable="true"
+                        android:src="@drawable/aprovia_logo"
+                        tools:src="@drawable/ic_launcher_foreground"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Área de mensagens -->
+                <ScrollView
+                    android:id="@+id/scrollMessages"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:fillViewport="true"
                     android:padding="12dp"
-                    android:textColor="@android:color/white"
-                    android:textColorHint="#AAAAAA"/>
+                    app:layout_constraintBottom_toTopOf="@id/inputRow"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/header">
 
-                <ImageButton
-                    android:id="@+id/btnSend"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="Enviar"
-                    android:src="@drawable/ic_send"
-                    app:tint="@color/white" />
-            </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/messagesContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </ScrollView>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+                <!-- Barra de digitar + botão enviar -->
+                <LinearLayout
+                    android:id="@+id/inputRow"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
+                    android:background="@drawable/bg_input"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    <EditText
+                        android:id="@+id/etMessage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:autofillHints=""
+                        android:hint="Digite sua mensagem..."
+                        android:background="@android:color/transparent"
+                        android:padding="12dp"
+                        android:textColor="@android:color/white"
+                        android:textColorHint="#AAAAAA" />
+
+                    <ImageButton
+                        android:id="@+id/btnSend"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="Enviar"
+                        android:src="@drawable/ic_send"
+                        app:tint="@color/white" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- MENU LATERAL (NavigationView) -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#1C1C1C"
+        app:itemTextColor="@android:color/white"
+        app:itemIconTint="@android:color/white"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/menu_drawer"/>
+
+
+</androidx.drawerlayout.widget.DrawerLayout>
