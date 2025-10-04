@@ -1,0 +1,26 @@
+<!-- res/menu/menu_drawer.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">    <!-- Itens principais na parte de cima -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_new_chat"
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="Nova Conversa" />
+        <item
+            android:id="@+id/nav_history"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Histórico" />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_footer"
+            android:icon="@android:drawable/ic_menu_manage"
+            android:title="Configurações" />
+
+        <item android:id="@+id/nav_logout"
+            android:icon="@android:drawable/ic_menu_close_clear_cancel"
+            android:title="Sair" />
+    </group>
+
+</menu>

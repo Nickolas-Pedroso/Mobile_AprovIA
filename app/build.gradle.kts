@@ -53,4 +53,5 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("androidx.core:core-ktx:1.16.0")
+    implementation("com.google.android.material:material:1.13.0")
 }
