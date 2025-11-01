@@ -35,28 +35,35 @@
             android:textColor="@android:color/black" />
 
         <!-- Usuário -->
-        <EditText
-            android:id="@+id/edtUser"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:autofillHints="username"
-            android:background="@drawable/bg_edittext"
-            android:hint="Usuario"
-            android:inputType="textEmailAddress"
-            android:padding="12dp" />
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <!-- Senha -->
-        <EditText
-            android:id="@+id/edtPass"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtUser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Usuário"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Senha com visualizador -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:autofillHints="password"
-            android:background="@drawable/bg_edittext"
-            android:hint="Senha"
-            android:inputType="textPassword"
-            android:padding="12dp" />
+            app:passwordToggleEnabled="true"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtPass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Senha"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
 
         <!-- Checkbox -->

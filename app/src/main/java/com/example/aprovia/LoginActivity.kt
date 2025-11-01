@@ -10,63 +10,104 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.content.edit
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Verifica se o usuário já está logado ANTES de renderizar a tela. 🚀
-        val prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE)
-        if (prefs.getBoolean("LOGGED_IN", false)) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-            return // Retorna para evitar a execução do resto do código
-        }
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_login)
 
-        // Ajuste de padding para as barras de sistema
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // Tela de Login, ação para ir para a tela de cadastro
-        val cadastro = findViewById<TextView>(R.id.txtCadastro)
-        cadastro.setOnClickListener {
-            val intent = Intent(this, CadastroActivity::class.java)
-            startActivity(intent)
+        findViewById<TextView>(R.id.txtCadastro).setOnClickListener {
+            startActivity(Intent(this, CadastroActivity::class.java))
         }
 
-        // Tela de Login, ação para ir para a tela de ajuda
-        val ajuda = findViewById<TextView>(R.id.txtAjuda)
-        ajuda.setOnClickListener {
-            val intent = Intent(this, faq_ajuda::class.java)
-            startActivity(intent)
+        findViewById<TextView>(R.id.txtAjuda).setOnClickListener {
+            startActivity(Intent(this, faq_ajuda::class.java))
         }
 
-        // Botão de login
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val edtUser = findViewById<EditText>(R.id.edtUser)
         val edtPass = findViewById<EditText>(R.id.edtPass)
 
         btnLogin.setOnClickListener {
-            val user = edtUser.text.toString()
-            val pass = edtPass.text.toString()
+            val username = edtUser.text.toString().trim()
+            val password = edtPass.text.toString().trim()
 
-            // Simulação de login
-            if (user == "admin" && pass == "1234") {
-                prefs.edit { putBoolean("LOGGED_IN", true) }
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish() // fecha a LoginActivity
-            } else {
-                Toast.makeText(this, "Usuário ou senha inválidos", Toast.LENGTH_SHORT).show()
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            // ** LÓGICA DE LOGIN POR NOME DE USUÁRIO **
+            // 1. Procura no Firestore um usuário com o 'username' fornecido.
+            db.collection("users")
+                .whereEqualTo("usuario", username)
+                .get()
+                .addOnSuccessListener { documents ->
+                    // 2. Verifica se algum usuário foi encontrado.
+                    if (documents.isEmpty) {
+                        Toast.makeText(baseContext, "Usuário ou senha incorretos.", Toast.LENGTH_LONG).show()
+                        return@addOnSuccessListener
+                    }
+
+                    // 3. Se encontrou, pega o e-mail desse usuário.
+                    val userDocument = documents.documents[0]
+                    val email = userDocument.getString("email")
+
+                    if (email == null) {
+                        Toast.makeText(baseContext, "Erro crítico: e-mail não encontrado para este usuário.", Toast.LENGTH_LONG).show()
+                        return@addOnSuccessListener
+                    }
+
+                    // 4. Usa o e-mail e a senha para fazer o login no Firebase Auth.
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this) { task ->
+                            if (task.isSuccessful) {
+                                // 5. Login bem-sucedido, vai para a tela principal.
+                                val intent = Intent(this, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                // Se a autenticação falhar, a senha está errada.
+                                val exception = task.exception
+                                val errorMessage = when (exception) {
+                                    is FirebaseAuthInvalidCredentialsException -> "Usuário ou senha incorretos."
+                                    else -> "Falha na autenticação: ${exception?.message}"
+                                }
+                                Toast.makeText(baseContext, errorMessage, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                }
+                .addOnFailureListener { e ->
+                    // Falha ao se comunicar com o banco de dados.
+                    Toast.makeText(baseContext, "Erro ao conectar com o servidor: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+        }
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        // Impede o login automático ao iniciar o app.
+        // Apenas o login manual é permitido.
+        if (auth.currentUser != null) {
+            auth.signOut()
         }
     }
 }
