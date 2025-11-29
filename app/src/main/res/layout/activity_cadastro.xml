@@ -11,7 +11,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="100dp"
+        android:paddingBottom="80dp"
         android:background="#181616"
         tools:context=".CadastroActivity">
 
@@ -77,6 +77,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_weight="1"
+                android:hint="Data de Nascimento"
+                app:placeholderText="dd/mm/aaaa"
                 app:endIconDrawable="@android:drawable/ic_menu_today"
                 app:endIconMode="custom">
 
@@ -86,8 +88,8 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="true"
-                    android:hint="Data de Nascimento"
-                    android:inputType="none"
+                    android:inputType="number"
+                    android:maxLength="10"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>

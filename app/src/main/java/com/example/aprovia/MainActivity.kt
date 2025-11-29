@@ -8,6 +8,8 @@ import android.os.Looper
 import android.view.Gravity
 import android.view.Menu
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -22,6 +24,8 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -44,6 +48,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navigationView: NavigationView
     private lateinit var messagesContainer: LinearLayout
     private lateinit var drawerLayout: DrawerLayout
+    
+    // Views da tela de Configurações (embutida)
+    private lateinit var settingsScrollView: ScrollView
+    private lateinit var scrollMessages: ScrollView
+    private lateinit var inputRow: LinearLayout
+    private lateinit var edtNomeConfig: TextInputEditText
+    private lateinit var edtEmailConfig: TextInputEditText
+    private lateinit var btnSalvarConfig: Button
+    private lateinit var btnDeletarContaConfig: Button
 
     private lateinit var logoutHandler: Handler
     private val logoutRunnable = Runnable {
@@ -75,6 +88,18 @@ class MainActivity : AppCompatActivity() {
         val btnSend = findViewById<ImageButton>(R.id.btnSend)
         navigationView = findViewById(R.id.navigation_view)
         messagesContainer = findViewById(R.id.messagesContainer)
+        
+        // Inicializa Views de Configurações
+        settingsScrollView = findViewById(R.id.settingsScrollView)
+        scrollMessages = findViewById(R.id.scrollMessages)
+        inputRow = findViewById(R.id.inputRow)
+        edtNomeConfig = findViewById(R.id.edtNomeConfig)
+        edtEmailConfig = findViewById(R.id.edtEmailConfig)
+        btnSalvarConfig = findViewById(R.id.btnSalvarConfig)
+        btnDeletarContaConfig = findViewById(R.id.btnDeletarContaConfig)
+        
+        btnSalvarConfig.setOnClickListener { saveSettings() }
+        btnDeletarContaConfig.setOnClickListener { confirmDeleteAccount() }
 
         loadUserData(navigationView)
         setupNavigation()
@@ -112,15 +137,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupNavigation() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
-            drawerLayout.closeDrawer(GravityCompat.START)
+            drawerLayout.closeDrawer(GravityCompat.START) 
 
             when (menuItem.itemId) {
                 R.id.nav_new_chat -> {
+                    showChat()
                     startNewChat()
                     return@setNavigationItemSelectedListener true
                 }
                 R.id.nav_footer -> {
-                    Toast.makeText(this, "Configurações clicado!", Toast.LENGTH_SHORT).show()
+                    showSettings()
                     return@setNavigationItemSelectedListener true
                 }
                 R.id.nav_logout -> {
@@ -132,6 +158,7 @@ class MainActivity : AppCompatActivity() {
             if (menuItem.groupId == R.id.nav_history_group) {
                 val selectedChatId = menuItem.titleCondensed?.toString()
                 if (!selectedChatId.isNullOrEmpty() && selectedChatId != currentChatId) {
+                    showChat()
                     currentChatId = selectedChatId
                     loadChatHistory(selectedChatId)
                 }
@@ -140,6 +167,134 @@ class MainActivity : AppCompatActivity() {
 
             false
         }
+    }
+    
+    private fun showChat() {
+        settingsScrollView.visibility = View.GONE
+        scrollMessages.visibility = View.VISIBLE
+        inputRow.visibility = View.VISIBLE
+    }
+
+    private fun showSettings() {
+        scrollMessages.visibility = View.GONE
+        inputRow.visibility = View.GONE
+        settingsScrollView.visibility = View.VISIBLE
+        loadSettingsData()
+    }
+
+    private fun loadSettingsData() {
+        val user = auth.currentUser
+        if (user != null) {
+            edtEmailConfig.setText(user.email)
+            database.reference.child("users").child(user.uid).get().addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val nome = snapshot.child("nome").getValue(String::class.java)
+                    edtNomeConfig.setText(nome)
+                }
+            }
+        }
+    }
+
+    private fun saveSettings() {
+        val user = auth.currentUser ?: return
+        val novoNome = edtNomeConfig.text.toString().trim()
+        val novoEmail = edtEmailConfig.text.toString().trim()
+
+        if (novoNome.isEmpty() || novoEmail.isEmpty()) {
+            Toast.makeText(this, "Preencha todos os campos.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Atualiza nome
+        database.reference.child("users").child(user.uid).child("nome").setValue(novoNome)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Nome atualizado!", Toast.LENGTH_SHORT).show()
+                // Atualiza o header também
+                loadUserData(navigationView)
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Erro ao atualizar nome.", Toast.LENGTH_SHORT).show()
+            }
+
+        if (novoEmail != user.email) {
+            reauthenticateAndChangeEmail(novoEmail)
+        }
+    }
+
+    private fun reauthenticateAndChangeEmail(novoEmail: String) {
+        val user = auth.currentUser ?: return
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Confirme sua senha")
+        builder.setMessage("Para alterar o e-mail, confirme sua senha atual.")
+
+        val container = LinearLayout(this)
+        container.orientation = LinearLayout.VERTICAL
+        val params = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(50, 0, 50, 0)
+        container.layoutParams = params
+        container.setPadding(50, 20, 50, 20)
+
+        val inputSenha = EditText(this)
+        inputSenha.hint = "Senha Atual"
+        inputSenha.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        container.addView(inputSenha)
+
+        builder.setView(container)
+
+        builder.setPositiveButton("Confirmar") { _, _ ->
+            val senha = inputSenha.text.toString()
+            if (senha.isNotEmpty()) {
+                val credential = EmailAuthProvider.getCredential(user.email!!, senha)
+                user.reauthenticate(credential).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        user.updateEmail(novoEmail).addOnCompleteListener { updateTask ->
+                            if (updateTask.isSuccessful) {
+                                database.reference.child("users").child(user.uid).child("email").setValue(novoEmail)
+                                Toast.makeText(this, "E-mail atualizado!", Toast.LENGTH_LONG).show()
+                                loadUserData(navigationView)
+                            } else {
+                                Toast.makeText(this, "Erro ao atualizar e-mail: ${updateTask.exception?.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this, "Senha incorreta.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+        builder.setNegativeButton("Cancelar", null)
+        builder.show()
+    }
+
+    private fun confirmDeleteAccount() {
+        AlertDialog.Builder(this)
+            .setTitle("Deletar Conta")
+            .setMessage("Tem certeza? Essa ação não pode ser desfeita.")
+            .setPositiveButton("Deletar") { _, _ ->
+                val user = auth.currentUser
+                val uid = user?.uid
+                
+                if (user != null && uid != null) {
+                    database.reference.child("users").child(uid).removeValue().addOnCompleteListener { dbTask ->
+                        if (dbTask.isSuccessful) {
+                            user.delete().addOnCompleteListener { authTask ->
+                                if (authTask.isSuccessful) {
+                                    Toast.makeText(this, "Conta deletada.", Toast.LENGTH_LONG).show()
+                                    performLogout()
+                                } else {
+                                    Toast.makeText(this, "Erro ao deletar autenticação.", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     private fun startNewChat() {

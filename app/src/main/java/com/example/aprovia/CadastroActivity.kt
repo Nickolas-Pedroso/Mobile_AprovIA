@@ -5,7 +5,9 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
 import android.text.Html
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.ImageView
@@ -48,12 +50,113 @@ class CadastroActivity : AppCompatActivity() {
         editTextDate = findViewById(R.id.editTextDate)
         textInputLayoutDate = findViewById(R.id.textInputDate)
 
-        editTextDate.setOnClickListener { showDatePicker() }
+        // Use o ícone final para abrir o calendário
         textInputLayoutDate.setEndIconOnClickListener { showDatePicker() }
+
+        // Configura a formatação automática enquanto digita
+        setupDateFormatting()
 
         setupAvatarSelection()
         setupCadastroButton()
         setupTermsLink()
+    }
+
+    private fun setupDateFormatting() {
+        editTextDate.addTextChangedListener(object : TextWatcher {
+            var isUpdating = false
+            var oldString = ""
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                 oldString = s.toString()
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val str = s.toString()
+                if (isUpdating) {
+                    isUpdating = false
+                    return
+                }
+
+                // Se estamos apagando, não interferimos (permite apagar a barra)
+                if (str.length < oldString.length) {
+                    return
+                }
+
+                var clean = str.replace("[^\\d]".toRegex(), "")
+                // Limit to 8 digits
+                if (clean.length > 8) clean = clean.substring(0, 8)
+
+                var formatted = ""
+                if (clean.isNotEmpty()) {
+                    if (clean.length >= 2) {
+                        formatted += clean.substring(0, 2)
+                        formatted += "/"
+                        if (clean.length >= 4) {
+                            formatted += clean.substring(2, 4)
+                            formatted += "/"
+                            formatted += clean.substring(4)
+                        } else {
+                            formatted += clean.substring(2)
+                        }
+                    } else {
+                        formatted += clean
+                    }
+                }
+
+                isUpdating = true
+                editTextDate.setText(formatted)
+                editTextDate.setSelection(formatted.length)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                validateDate(s.toString())
+            }
+        })
+    }
+
+    private fun validateDate(dateStr: String) {
+        if (dateStr.length != 10) {
+            textInputLayoutDate.error = null
+            return
+        }
+
+        val parts = dateStr.split("/")
+        if (parts.size == 3) {
+            val day = parts[0].toIntOrNull()
+            val month = parts[1].toIntOrNull()
+            val year = parts[2].toIntOrNull()
+
+            if (day != null && month != null && year != null) {
+                val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+
+                if (year > currentYear) {
+                    textInputLayoutDate.error = "Ano inválido"
+                    return
+                }
+
+                if (month < 1 || month > 12 || day < 1 || day > 31) {
+                     textInputLayoutDate.error = "Data inválida"
+                     return
+                }
+
+                // Verifica se é maior de 12 anos
+                val dob = Calendar.getInstance()
+                dob.set(year, month - 1, day)
+                val today = Calendar.getInstance()
+                var age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR)
+                if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
+                    age--
+                }
+
+                if (age < 12) {
+                    textInputLayoutDate.error = "Precisa ter mais de 12 anos"
+                } else {
+                    textInputLayoutDate.error = null
+                }
+            } else {
+                textInputLayoutDate.error = "Data inválida"
+            }
+        }
     }
 
     private fun setupTermsLink() {
@@ -126,6 +229,13 @@ class CadastroActivity : AppCompatActivity() {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            
+             // Verifica se há erro na data antes de prosseguir
+            if (textInputLayoutDate.error != null) {
+                Toast.makeText(this, "Corrija a data de nascimento", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
             if (selectedAvatarName == null) {
                 Toast.makeText(this, "Por favor, selecione um avatar", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -202,9 +312,21 @@ class CadastroActivity : AppCompatActivity() {
                     textInputLayoutDate.error = "Data de nascimento inválida"
                     editTextDate.setText("")
                 } else {
-                    textInputLayoutDate.error = null
-                    val date = "%02d/%02d/%04d".format(selectedDay, selectedMonth + 1, selectedYear)
-                    editTextDate.setText(date)
+                    // Calcula a idade também no DatePicker
+                    val today = Calendar.getInstance()
+                    var age = today.get(Calendar.YEAR) - selectedYear
+                    if (today.get(Calendar.DAY_OF_YEAR) < selectedCalendar.get(Calendar.DAY_OF_YEAR)) {
+                        age--
+                    }
+
+                    if (age < 12) {
+                        textInputLayoutDate.error = "Precisa ter mais de 12 anos"
+                        editTextDate.setText("") 
+                    } else {
+                        textInputLayoutDate.error = null
+                        val date = "%02d/%02d/%04d".format(selectedDay, selectedMonth + 1, selectedYear)
+                        editTextDate.setText(date)
+                    }
                 }
             },
             year, month, day
