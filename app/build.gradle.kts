@@ -57,6 +57,9 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-storage-ktx") // Dependência para o Firebase Storage
 
+    // Login com Google
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
     // Dependências do Glide para carregamento de imagem
     implementation("com.github.bumptech.glide:glide:4.12.0")
     kapt("com.github.bumptech.glide:compiler:4.12.0")

@@ -5,10 +5,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Html
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -49,6 +53,31 @@ class CadastroActivity : AppCompatActivity() {
 
         setupAvatarSelection()
         setupCadastroButton()
+        setupTermsLink()
+    }
+
+    private fun setupTermsLink() {
+        val txtLerTermos = findViewById<TextView>(R.id.txtLerTermos)
+        txtLerTermos.setOnClickListener {
+            val termsText = getString(R.string.full_terms)
+
+            val scrollView = ScrollView(this)
+            scrollView.setBackgroundColor(Color.parseColor("#181616"))
+
+            val textView = TextView(this)
+            textView.text = Html.fromHtml(termsText, Html.FROM_HTML_MODE_COMPACT)
+            textView.setPadding(50, 40, 50, 40)
+            textView.textSize = 16f
+            textView.setTextColor(Color.WHITE)
+            
+            scrollView.addView(textView)
+
+            AlertDialog.Builder(this)
+                .setTitle("Termos de Uso")
+                .setView(scrollView)
+                .setPositiveButton("Fechar") { dialog, _ -> dialog.dismiss() }
+                .show()
+        }
     }
 
     private fun setupAvatarSelection() {
@@ -91,6 +120,7 @@ class CadastroActivity : AppCompatActivity() {
             val email = findViewById<TextInputEditText>(R.id.editTextEmail).text.toString().trim()
             val senha = findViewById<TextInputEditText>(R.id.editTextSenha).text.toString().trim()
             val confirmarSenha = findViewById<TextInputEditText>(R.id.editTextConfirmarSenha).text.toString().trim()
+            val chkTermos = findViewById<CheckBox>(R.id.chkTermos)
 
             if (nome.isEmpty() || usuario.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty() || confirmarSenha.isEmpty()) {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
@@ -106,6 +136,10 @@ class CadastroActivity : AppCompatActivity() {
             }
             if (senha != confirmarSenha) {
                 Toast.makeText(this, "As senhas não coincidem", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (!chkTermos.isChecked) {
+                Toast.makeText(this, "Você deve aceitar os Termos de Uso para continuar.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

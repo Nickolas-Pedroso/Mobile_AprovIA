@@ -193,7 +193,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
-            app:passwordToggleEnabled="true">
+            app:endIconMode="password_toggle"
+            app:endIconTint="@android:color/darker_gray">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextSenha"
@@ -224,7 +225,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView3"
-            app:passwordToggleEnabled="true">
+            app:endIconMode="password_toggle"
+            app:endIconTint="@android:color/darker_gray">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextConfirmarSenha"
@@ -236,20 +238,35 @@
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/txtEntrar"
+        <!-- Container dos Termos -->
+        <LinearLayout
+            android:id="@+id/containerTermos"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
             android:layout_marginTop="20dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:minHeight="48dp"
-            android:text="Já tem conta? Entre."
-            android:textColor="#409EEF"
-            app:layout_constraintEnd_toStartOf="@+id/btnCadastrar"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+
+            <CheckBox
+                android:id="@+id/chkTermos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#409EEF" />
+
+            <TextView
+                android:id="@+id/txtLerTermos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/terms_text"
+                android:textColor="#409EEF"
+                android:textStyle="bold" />
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/btnCadastrar"
@@ -259,7 +276,23 @@
             android:text="Cadastrar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtEntrar" />
+            app:layout_constraintTop_toBottomOf="@+id/containerTermos" />
+
+        <TextView
+            android:id="@+id/txtEntrar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:minHeight="48dp"
+            android:text="Já tem conta? Entre."
+            android:textColor="#409EEF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnCadastrar"
+            android:layout_marginBottom="32dp"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

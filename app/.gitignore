@@ -1,1 +1,4 @@
 /build
+/libs
+/src/test/resources
+/src/androidTest/resources

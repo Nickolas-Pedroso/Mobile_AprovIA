@@ -13,7 +13,20 @@
           "package_name": "com.example.aprovia"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "512090512245-dor9r45g5fp1cu22ilgd36cslu5p5ur1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.aprovia",
+            "certificate_hash": "54e0d9c69eebae57be12159dc233ae09193a3a06"
+          }
+        },
+        {
+          "client_id": "512090512245-ukeoqr699tn2lhhu0g2sdhjeimacpts3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBbtQLQl1CW33FQtR5cfQzarWWz6E0Sm-k"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "512090512245-ukeoqr699tn2lhhu0g2sdhjeimacpts3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

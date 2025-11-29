@@ -7,5 +7,27 @@
     <string name="open_drawer">Abrir menu</string>
     <string name="close_drawer">Fechar menu</string>
     <string name="header_image_desc">Imagem do usuário</string>
+    <string name="default_web_client_id">512090512245-ukeoqr699tn2lhhu0g2sdhjeimacpts3.apps.googleusercontent.com</string>
+
+
+    <string name="terms_text">Li e concordo com os Termos de Uso</string>
+    <string name="full_terms">
+        <![CDATA[
+        <b>Termos e Condições de Uso</b><br><br>
+        Bem-vindo ao AprovIA! Ao utilizar nosso aplicativo, você concorda com os seguintes termos:<br><br>
+        <b>1. Uso Aceitável</b><br>
+        Você concorda em usar este aplicativo apenas para fins legais e de acordo com todas as leis aplicáveis.<br><br>
+        <b>2. Privacidade</b><br>
+        Seus dados pessoais serão tratados de acordo com nossa Política de Privacidade. Nós respeitamos sua privacidade e protegemos suas informações.<br><br>
+        <b>3. Responsabilidade</b><br>
+        O AprovIA é uma ferramenta de assistência baseada em IA. Embora nos esforcemos para fornecer informações precisas, não garantimos a exatidão completa das respostas geradas pela IA.<br><br>
+        <b>4. Conta do Usuário</b><br>
+        Você é responsável por manter a confidencialidade de sua conta e senha. O compartilhamento de contas não é recomendado.<br><br>
+        <b>5. Alterações</b><br>
+        Reservamo-nos o direito de modificar estes termos a qualquer momento. O uso contínuo do aplicativo após tais alterações constitui sua aceitação dos novos termos.<br><br>
+        Obrigado por usar o AprovIA!
+        ]]>
+    </string>
+
 
 </resources>
