@@ -54,7 +54,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            app:passwordToggleEnabled="true"
+            app:endIconMode="password_toggle"
+            app:endIconTint="@android:color/darker_gray"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -65,6 +66,17 @@
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Esqueci a senha -->
+        <TextView
+            android:id="@+id/txtEsqueciSenha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Esqueci minha senha"
+            android:textColor="#6A1B9A"
+            android:layout_gravity="end"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true" />
 
         <!-- Checkbox -->
         <CheckBox
@@ -102,6 +114,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:clickable="true"
+            android:minHeight="48dp"
             android:text="Precisa de ajuda?"
             android:textColor="@android:color/darker_gray" />
 

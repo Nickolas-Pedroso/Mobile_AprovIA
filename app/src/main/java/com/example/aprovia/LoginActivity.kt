@@ -1,12 +1,16 @@
 package com.example.aprovia
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -40,6 +44,92 @@ class LoginActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.txtAjuda).setOnClickListener {
             startActivity(Intent(this, faq_ajuda::class.java))
+        }
+
+        // Lógica para Esqueci a Senha
+        findViewById<TextView>(R.id.txtEsqueciSenha).setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Redefinir Senha")
+
+            // Container vertical para o EditText e a mensagem de erro
+            val container = LinearLayout(this)
+            container.orientation = LinearLayout.VERTICAL
+            val params = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(50, 20, 50, 0)
+            container.layoutParams = params
+            container.setPadding(50, 20, 50, 20)
+
+            val input = EditText(this)
+            input.hint = "Digite seu e-mail"
+            input.inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+            container.addView(input)
+
+            val errorText = TextView(this)
+            errorText.text = "E-mail não encontrado."
+            errorText.setTextColor(Color.RED)
+            errorText.textSize = 12f
+            errorText.visibility = android.view.View.GONE
+            errorText.setPadding(0, 10, 0, 0)
+            container.addView(errorText)
+
+            builder.setView(container)
+
+            // Configura os botões, mas o comportamento do "Enviar" será sobrescrito depois
+            builder.setPositiveButton("Enviar", null)
+            builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.cancel() }
+
+            val dialog = builder.create()
+            dialog.show()
+
+            // Sobrescreve o OnClickListener do botão positivo para evitar que o diálogo feche automaticamente
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val email = input.text.toString().trim()
+                errorText.visibility = android.view.View.GONE // Reseta o erro
+
+                if (email.isEmpty()) {
+                    errorText.text = "Por favor, digite seu e-mail."
+                    errorText.visibility = android.view.View.VISIBLE
+                    return@setOnClickListener
+                }
+
+                // Desabilita o botão para evitar múltiplos cliques
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+
+                // 1. Verifica no Realtime Database se o e-mail existe
+                database.reference.child("users")
+                    .orderByChild("email")
+                    .equalTo(email)
+                    .get()
+                    .addOnSuccessListener { dataSnapshot ->
+                        if (dataSnapshot.exists()) {
+                            // 2. Se existe, envia o e-mail de reset
+                            auth.sendPasswordResetEmail(email)
+                                .addOnCompleteListener { task ->
+                                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(this, "E-mail de redefinição enviado!", Toast.LENGTH_LONG).show()
+                                        dialog.dismiss()
+                                    } else {
+                                        errorText.text = "Erro ao enviar: ${task.exception?.message}"
+                                        errorText.visibility = android.view.View.VISIBLE
+                                    }
+                                }
+                        } else {
+                            // 3. Se não existe, mostra erro em vermelho
+                            dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+                            errorText.text = "Este e-mail não está cadastrado."
+                            errorText.visibility = android.view.View.VISIBLE
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+                        errorText.text = "Erro de conexão: ${e.message}"
+                        errorText.visibility = android.view.View.VISIBLE
+                    }
+            }
         }
 
         val btnLogin = findViewById<Button>(R.id.btnLogin)
