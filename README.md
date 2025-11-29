@@ -2,6 +2,12 @@
 
 App Android nativo (Kotlin) focado em chat com IA.
 
+# Integrantes
+
+- Allan Deyvison
+- Beatriz Medeiros
+- Nickolas Pedroso
+
 ## O que o app faz
 Basicamente é um chat onde você conversa com uma IA. O projeto usa Firebase para quase tudo no backend.
 
