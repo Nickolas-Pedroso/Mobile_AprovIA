@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
+import android.view.Menu
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
@@ -22,12 +23,28 @@ import com.bumptech.glide.Glide
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
+import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+    private lateinit var database: FirebaseDatabase
+    private lateinit var userChatsRef: DatabaseReference
+    private var userId: String? = null
+    private var currentChatId: String? = null
+
+    private lateinit var navigationView: NavigationView
+    private lateinit var messagesContainer: LinearLayout
+    private lateinit var drawerLayout: DrawerLayout
+
     private lateinit var logoutHandler: Handler
     private val logoutRunnable = Runnable {
         performLogout("Sessão expirada por inatividade")
@@ -37,7 +54,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()
-        if (auth.currentUser == null) {
+        userId = auth.currentUser?.uid
+        if (userId == null) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
@@ -48,52 +66,134 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         logoutHandler = Handler(Looper.getMainLooper())
-        db = FirebaseFirestore.getInstance()
+        database = FirebaseDatabase.getInstance()
+        userChatsRef = database.getReference("chats").child(userId!!)
 
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawer_layout)
         val menuIcon = findViewById<ImageView>(R.id.menuIcon)
-        val messagesContainer = findViewById<LinearLayout>(R.id.messagesContainer)
         val input = findViewById<EditText>(R.id.etMessage)
         val btnSend = findViewById<ImageButton>(R.id.btnSend)
-        val navigationView = findViewById<NavigationView>(R.id.navigation_view)
+        navigationView = findViewById(R.id.navigation_view)
+        messagesContainer = findViewById(R.id.messagesContainer)
 
         loadUserData(navigationView)
+        setupNavigation()
+        startNewChat()
 
         menuIcon.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
-        }
-
-        navigationView.setNavigationItemSelectedListener { menuItem ->
-            drawerLayout.closeDrawer(GravityCompat.START)
-            when (menuItem.itemId) {
-                R.id.nav_new_chat -> {
-                    messagesContainer.removeAllViews()
-                    true
-                }
-                R.id.nav_history -> {
-                    Toast.makeText(this, "Histórico clicado!", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                R.id.nav_footer -> {
-                    Toast.makeText(this, "Configurações clicado!", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                R.id.nav_logout -> {
-                    performLogout()
-                    true
-                }
-                else -> false
-            }
+            updateHistoryMenu()
         }
 
         btnSend.setOnClickListener {
             val text = input.text.toString().trim()
             if (text.isNotEmpty()) {
+                var isFirstMessage = false
+                if (currentChatId == null) {
+                    isFirstMessage = true
+                    val newChatId = userChatsRef.push().key ?: return@setOnClickListener
+                    currentChatId = newChatId
+                    userChatsRef.child(newChatId).child("createdAt").setValue(ServerValue.TIMESTAMP)
+                }
+
                 addMessage(text, isUser = true)
                 input.text?.clear()
+
+                if (isFirstMessage) {
+                    updateHistoryMenu()
+                }
+
                 messagesContainer.postDelayed({
                     addMessage("Olá, tudo bem? Como posso te ajudar hoje? 🙂", isUser = false)
                 }, 400)
+            }
+        }
+    }
+
+    private fun setupNavigation() {
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            drawerLayout.closeDrawer(GravityCompat.START)
+
+            when (menuItem.itemId) {
+                R.id.nav_new_chat -> {
+                    startNewChat()
+                    return@setNavigationItemSelectedListener true
+                }
+                R.id.nav_footer -> {
+                    Toast.makeText(this, "Configurações clicado!", Toast.LENGTH_SHORT).show()
+                    return@setNavigationItemSelectedListener true
+                }
+                R.id.nav_logout -> {
+                    performLogout()
+                    return@setNavigationItemSelectedListener true
+                }
+            }
+
+            if (menuItem.groupId == R.id.nav_history_group) {
+                val selectedChatId = menuItem.titleCondensed?.toString()
+                if (!selectedChatId.isNullOrEmpty() && selectedChatId != currentChatId) {
+                    currentChatId = selectedChatId
+                    loadChatHistory(selectedChatId)
+                }
+                return@setNavigationItemSelectedListener true
+            }
+
+            false
+        }
+    }
+
+    private fun startNewChat() {
+        currentChatId = null
+        messagesContainer.removeAllViews()
+    }
+
+    private fun updateHistoryMenu() {
+        val historyGroupItem = navigationView.menu.findItem(R.id.nav_history_group)
+        val historySubMenu = historyGroupItem?.subMenu
+
+        if (historySubMenu == null) return
+
+        userChatsRef.orderByChild("createdAt").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                historySubMenu.clear()
+
+                if (snapshot.exists()) {
+                    historyGroupItem.isEnabled = true
+                    val chatEntries = snapshot.children.reversed()
+                    for (chatSnapshot in chatEntries) {
+                        val chatId = chatSnapshot.key ?: continue
+                        val timestamp = chatSnapshot.child("createdAt").getValue(Long::class.java) ?: 0
+                        val formattedDate = SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault()).format(Date(timestamp))
+
+                        val menuItem = historySubMenu.add(R.id.nav_history_group, Menu.NONE, 0, formattedDate)
+                        menuItem.titleCondensed = chatId
+                    }
+                } else {
+                    historyGroupItem.isEnabled = false
+                    historySubMenu.add("Nenhum histórico").isEnabled = false
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                historyGroupItem.isEnabled = false
+                historySubMenu.clear()
+                historySubMenu.add("Erro ao carregar").isEnabled = false
+                Toast.makeText(this@MainActivity, "Erro ao carregar histórico", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun loadChatHistory(chatId: String) {
+        userChatsRef.child(chatId).child("messages").get().addOnSuccessListener { dataSnapshot ->
+            messagesContainer.removeAllViews()
+            if (dataSnapshot.exists()) {
+                for (messageSnapshot in dataSnapshot.children) {
+                    val text = messageSnapshot.child("text").getValue(String::class.java)
+                    val isUser = messageSnapshot.child("user").getValue(Boolean::class.java)
+                    if (text != null && isUser != null) {
+                        addMessage(text, isUser, saveToDb = false)
+                    }
+                }
             }
         }
     }
@@ -139,14 +239,13 @@ class MainActivity : AppCompatActivity() {
         val userName = headerView.findViewById<TextView>(R.id.nav_user_name)
         val userEmail = headerView.findViewById<TextView>(R.id.nav_user_email)
 
-        val userId = auth.currentUser?.uid
         if (userId != null) {
-            db.collection("users").document(userId).get()
-                .addOnSuccessListener { document ->
-                    if (document != null && document.exists()) {
-                        val name = document.getString("nome") ?: ""
-                        val email = document.getString("email") ?: ""
-                        val avatarName = document.getString("profileImageUrl") ?: ""
+            database.getReference("users").child(userId!!).get()
+                .addOnSuccessListener { dataSnapshot ->
+                    if (dataSnapshot.exists()) {
+                        val name = dataSnapshot.child("nome").getValue(String::class.java) ?: ""
+                        val email = dataSnapshot.child("email").getValue(String::class.java) ?: ""
+                        val avatarName = dataSnapshot.child("profileImageUrl").getValue(String::class.java) ?: ""
 
                         userName.text = name
                         userEmail.text = email
@@ -210,9 +309,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateUserProfileAvatar(avatarName: String, dialog: AlertDialog) {
-        val userId = auth.currentUser?.uid ?: return
-        db.collection("users").document(userId)
-            .update("profileImageUrl", avatarName)
+        if (userId == null) return
+        database.getReference("users").child(userId!!).child("profileImageUrl").setValue(avatarName)
             .addOnSuccessListener {
                 Toast.makeText(this, "Avatar atualizado!", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
@@ -230,8 +328,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun addMessage(text: String, isUser: Boolean) {
-        val messagesContainer = findViewById<LinearLayout>(R.id.messagesContainer)
+    private fun addMessage(text: String, isUser: Boolean, saveToDb: Boolean = true) {
         val tv = TextView(this).apply {
             this.text = text
             setTextColor(resources.getColor(android.R.color.white, theme))
@@ -252,5 +349,11 @@ class MainActivity : AppCompatActivity() {
         tv.layoutParams = lp
         messagesContainer.addView(tv)
         scrollToBottom()
+
+        if (saveToDb && currentChatId != null) {
+            val messageId = userChatsRef.child(currentChatId!!).child("messages").push().key ?: return
+            val messageData = mapOf("text" to text, "user" to isUser)
+            userChatsRef.child(currentChatId!!).child("messages").child(messageId).setValue(messageData)
+        }
     }
 }

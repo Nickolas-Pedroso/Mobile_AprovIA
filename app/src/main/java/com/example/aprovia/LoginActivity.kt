@@ -12,18 +12,18 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+    private lateinit var database: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
+        database = FirebaseDatabase.getInstance()
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_login)
@@ -56,20 +56,21 @@ class LoginActivity : AppCompatActivity() {
             }
 
             // ** LÓGICA DE LOGIN POR NOME DE USUÁRIO **
-            // 1. Procura no Firestore um usuário com o 'username' fornecido.
-            db.collection("users")
-                .whereEqualTo("usuario", username)
+            // 1. Procura no Realtime Database um usuário com o 'username' fornecido.
+            database.reference.child("users")
+                .orderByChild("usuario")
+                .equalTo(username)
                 .get()
-                .addOnSuccessListener { documents ->
+                .addOnSuccessListener { dataSnapshot ->
                     // 2. Verifica se algum usuário foi encontrado.
-                    if (documents.isEmpty) {
+                    if (!dataSnapshot.exists()) {
                         Toast.makeText(baseContext, "Usuário ou senha incorretos.", Toast.LENGTH_LONG).show()
                         return@addOnSuccessListener
                     }
 
                     // 3. Se encontrou, pega o e-mail desse usuário.
-                    val userDocument = documents.documents[0]
-                    val email = userDocument.getString("email")
+                    val userNode = dataSnapshot.children.first()
+                    val email = userNode.child("email").getValue(String::class.java)
 
                     if (email == null) {
                         Toast.makeText(baseContext, "Erro crítico: e-mail não encontrado para este usuário.", Toast.LENGTH_LONG).show()

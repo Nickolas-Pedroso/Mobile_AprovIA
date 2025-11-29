@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import java.util.*
 
 class CadastroActivity : AppCompatActivity() {
@@ -28,14 +28,14 @@ class CadastroActivity : AppCompatActivity() {
     private lateinit var avatarImageViews: List<ImageView>
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+    private lateinit var database: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro)
 
         auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
+        database = FirebaseDatabase.getInstance()
 
         findViewById<TextView>(R.id.txtEntrar).setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
@@ -85,7 +85,6 @@ class CadastroActivity : AppCompatActivity() {
 
     private fun setupCadastroButton() {
         findViewById<Button>(R.id.btnCadastrar).setOnClickListener {
-            // **CORREÇÃO APLICADA AQUI: Usando TextInputEditText**
             val nome = findViewById<TextInputEditText>(R.id.txtInputNome).text.toString().trim()
             val usuario = findViewById<TextInputEditText>(R.id.editTextUser).text.toString().trim()
             val dataNascimento = findViewById<TextInputEditText>(R.id.editTextDate).text.toString().trim()
@@ -125,7 +124,7 @@ class CadastroActivity : AppCompatActivity() {
                     "dataNascimento" to dataNascimento,
                     "profileImageUrl" to avatarName
                 )
-                saveUserToFirestore(userId, userMap)
+                saveUserToDatabase(userId, userMap)
             } else {
                 val error = when (task.exception) {
                     is FirebaseAuthWeakPasswordException -> "A senha é muito fraca. Use pelo menos 6 caracteres."
@@ -138,8 +137,8 @@ class CadastroActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveUserToFirestore(userId: String, userMap: Map<String, Any>) {
-        db.collection("users").document(userId).set(userMap)
+    private fun saveUserToDatabase(userId: String, userMap: Map<String, Any>) {
+        database.reference.child("users").child(userId).setValue(userMap)
             .addOnSuccessListener {
                 auth.signOut()
                 Toast.makeText(this, "Cadastro bem-sucedido! Faça o login.", Toast.LENGTH_LONG).show()
