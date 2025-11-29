@@ -46,7 +46,7 @@
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="340dp"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="19dp"
             android:baselineAligned="false"
             android:orientation="horizontal"
@@ -63,9 +63,8 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextUser"
-                    android:layout_width="150dp"
-                    android:layout_height="53dp"
-                    android:layout_marginStart="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:hint="Usuario"
                     android:textColorHint="#78909C"
                     android:textSize="16sp" />
@@ -83,9 +82,8 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextDate"
-                    android:layout_width="160dp"
-                    android:layout_height="53dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="true"
                     android:hint="Data de Nascimento"
@@ -94,33 +92,67 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- FOTO REDONDA -->
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imageView"
-            android:layout_width="131dp"
-            android:layout_height="127dp"
-            android:layout_marginStart="42dp"
-            android:layout_marginTop="42dp"
-            android:layout_marginEnd="17dp"
-            android:background="@android:color/darker_gray"
-            android:scaleType="centerCrop"
-            app:layout_constraintEnd_toStartOf="@+id/btnPickImage"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-            app:shapeAppearanceOverlay="@style/CircularImage" />
-
-        <Button
-            android:id="@+id/btnPickImage"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/avatarSelectionGroup"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="17dp"
-            android:layout_marginTop="84dp"
-            android:layout_marginEnd="16dp"
-            android:text="Escolher Foto"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+            android:layout_marginTop="30dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="@id/linearLayout"
+            app:layout_constraintStart_toStartOf="@id/linearLayout"
+            app:layout_constraintTop_toBottomOf="@id/linearLayout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecione um avatar"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/avatar_f_azul"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/f_azul"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Avatar feminino de cabelo azul"/>
+
+                <ImageView
+                    android:id="@+id/avatar_f_castanho"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/f_castanho"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Avatar feminino de cabelo castanho"/>
+
+                <ImageView
+                    android:id="@+id/avatar_m_verde"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/m_verde"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Avatar masculino de cabelo verde"/>
+
+                <ImageView
+                    android:id="@+id/avatar_m_azul"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/m_azul"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Avatar masculino de cabelo azul"/>
+            </LinearLayout>
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputEmail"
@@ -129,7 +161,7 @@
             android:layout_marginTop="30dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView">
+            app:layout_constraintTop_toBottomOf="@id/avatarSelectionGroup">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextEmail"
@@ -138,25 +170,8 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:hint="Endereço de e-mail"
+                android:inputType="textEmailAddress"
                 android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputSenha"
-            android:layout_width="350dp"
-            android:layout_height="63dp"
-            android:layout_marginTop="40dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputEmail">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextSenha"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:hint="Senha" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -169,6 +184,27 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputEmail" />
 
+        <!-- CAMPO SENHA COM VISUALIZADOR -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputSenha"
+            android:layout_width="350dp"
+            android:layout_height="63dp"
+            android:layout_marginTop="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextSenha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:hint="Senha"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <TextView
             android:id="@+id/textView3"
             android:layout_width="333dp"
@@ -179,6 +215,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputSenha" />
 
+        <!-- CAMPO CONFIRMAR SENHA COM VISUALIZADOR -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
             android:layout_width="350dp"
@@ -186,7 +223,8 @@
             android:layout_marginTop="30dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3">
+            app:layout_constraintTop_toBottomOf="@+id/textView3"
+            app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextConfirmarSenha"
@@ -194,7 +232,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:hint="Confirmar Senha" />
+                android:hint="Confirmar Senha"
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView

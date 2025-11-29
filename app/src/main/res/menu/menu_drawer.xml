@@ -1,16 +1,20 @@
 <!-- res/menu/menu_drawer.xml -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">    <!-- Itens principais na parte de cima -->
+    tools:showIn="navigation_view">
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_new_chat"
             android:icon="@android:drawable/ic_menu_add"
             android:title="Nova Conversa" />
         <item
-            android:id="@+id/nav_history"
+            android:id="@+id/nav_history_group"
             android:icon="@android:drawable/ic_menu_recent_history"
-            android:title="Histórico" />
+            android:title="Histórico">
+            <menu>
+                <!-- Os itens do histórico serão adicionados aqui via código -->
+            </menu>
+        </item>
     </group>
 
     <group android:checkableBehavior="single">

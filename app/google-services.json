@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "512090512245",
+    "firebase_url": "https://aprovia-2fad8-default-rtdb.firebaseio.com",
+    "project_id": "aprovia-2fad8",
+    "storage_bucket": "aprovia-2fad8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512090512245:android:0b515d3204def91f5e913c",
+        "android_client_info": {
+          "package_name": "com.example.aprovia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbtQLQl1CW33FQtR5cfQzarWWz6E0Sm-k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
